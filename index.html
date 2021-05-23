@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<head>
+    <title>Barley-break</title>
+    <style>
+        BODY {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .board {
+            width: 400px;
+            height: 400px;
+            position: relative;
+            background: rgba(0, 0, 0, 0.2);
+            box-shadow: 0px 0px 15px 5px rgba(0, 0, 0, 0.2) inset;
+            user-select: none;
+        }
+        .board_cell {
+            position: absolute;
+            box-shadow: 0px 0px 15px 5px rgba(0, 0, 0, 0.1) inset;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font: bold 20px Arial;
+            color: rgba(0, 0, 0, 0.7);
+            transition: .3s;
+            cursor:pointer;
+        }
+        .title {
+            font: bold 30px Arial;
+            color: rgba(0, 0, 0, 0.85);
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="title">Barley-break</div>
+    <div class="board"></div>
+    
+
+    <script>
+        window.onload = function()
+        {
+            const BOARD = document.querySelector('.board');
+
+            // Logic
+            var board = [], TARGET = -1, INDEX = -1;
+            const size = 4;
+
+            for (let i = 0; i < size*size-1; i++)
+            {
+                // Create cell data
+                let cell = {
+                    posX: i - Math.floor(i/size)*size,
+                    posY: Math.floor(i/size),
+                    index: i
+                };
+                board.push(cell);
+
+                // Append cell
+                BOARD.innerHTML += '<div class="board_cell" style="height:' + (100/size) + '%; width:' + (100/size) + '%; transform: translateX(' + cell.posX*100 + '%) translateY(' + cell.posY*100 + '%); background: rgb(' + 0 + ',' + Math.round(i/size/size*240) + ', 255);">' + i +'</div>'
+            }
+            // Last cell is empty
+            board[size*size-1] = 0;
+
+            const CELLS = document.querySelectorAll('.board_cell');
+            
+            for (let i = 0; i < CELLS.length; i++)
+            {
+                CELLS[i].addEventListener('click', (e) =>
+                {
+                    TARGET = i;
+                    for (k = 0; k < board.length; k++)
+                        if (board[k].index == TARGET)
+                        {
+                            INDEX = k;
+                            break;
+                        }
+                    
+                    console.log('-> target:',TARGET);
+                    console.log('array-index:',INDEX);
+                    
+                    let dir;
+                    if (board[INDEX+1] == 0) dir = 1;
+                    else if (board[INDEX-1] == 0) dir = -1;
+                    else if (board[INDEX+size] == 0) dir = size;
+                    else if (board[INDEX-size] == 0) dir = -size;
+
+                    // Swipe
+                    if (Math.abs(dir) == 1)
+                    {
+                        // Swipe horisontal
+                        console.log('Swipe horisontal');
+                        let bl = true;
+                        if (dir > 0 && ((INDEX+dir) % size) == 0) bl = false;
+                        if (dir < 0 && (INDEX % size) == 0) bl = false;
+
+                        if (board[INDEX+dir] == 0 && bl)
+                        {
+                            board[INDEX].posX += dir;
+                            CELLS[TARGET].style.transform =  'translateX(' + board[INDEX].posX*100 + '%) translateY(' + board[INDEX].posY*100 + '%)';
+                            board[INDEX+dir] = board[INDEX];
+                            board[INDEX] = 0;
+                        }
+                    }
+                    else if (Math.abs(dir) == size)
+                    {
+                        // Swipe vertical
+                        console.log('Swipe vertical');
+                        if (board[INDEX+dir] == 0)
+                        {
+                            board[INDEX].posY += dir/size;
+                            CELLS[TARGET].style.transform =  'translateX(' + board[INDEX].posX*100 + '%) translateY(' + board[INDEX].posY*100 + '%)';
+                            board[INDEX+dir] = board[INDEX];
+                            board[INDEX] = 0;
+                        }
+                    }
+                    TARGET = -1;
+                    INDEX = -1;
+                });
+            }
+        }
+    </script>
+</body>
+</html>

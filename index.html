@@ -20,7 +20,7 @@
             cursor:pointer;
             user-select: none;
             
-            font: bold 20px Arial;
+            font: bold 40px Arial;
             color: rgba(0, 0, 0, 0.7);
 
             display: flex;
@@ -52,6 +52,14 @@
             display: flex;
             align-items: center;
             justify-content: center;
+        }
+
+        @media (orientation: landscape) {
+            .board { width: 70vh; height: 70vh; }
+        }
+
+        @media (orientation: portrait) {
+            .board { width: 80vw; height: 80vw; }
         }
     </style>
 </head>

@@ -42,8 +42,9 @@
             border-radius: 15px;
             
             font: bold 20px Arial;
-            color: rgba(0, 0, 0, 0.55);
+            color: rgba(0, 0, 0, 0.75);
             box-shadow: 0px 0px 10px 5px rgba(0, 0, 0, 0.2);
+            letter-spacing: 1px;
 
             cursor: pointer;
             user-select: none;
@@ -64,9 +65,9 @@
         const size = 4;
         var board = [];
 
+        // Create cells
         for (let i = 0; i < size*size-1; i++)
         {
-            // Create cell data
             let cell = {
                 posX: i - Math.floor(i/size)*size,
                 posY: Math.floor(i/size),
@@ -74,13 +75,14 @@
             };
             board.push(cell);
 
-            // Append cell
             BOARD.innerHTML += '<div class="board_cell" style="height:' + (100/size) + '%; width:' + (100/size) + '%; transform: translateX(' + cell.posX*100 + '%) translateY(' + cell.posY*100 + '%); background: rgb(' + 0 + ',' + Math.round(i/size/size*240) + ', 255);">' + (i+1) +'</div>'
         }
         board[size*size-1] = 0;
 
+        // Move logic
         function MoveCell(TARGET)
         {
+            // Find cell in array
             let INDEX = -1;
             for (k = 0; k < board.length; k++)
                 if (board[k].index == TARGET) { INDEX = k; break; }
@@ -88,34 +90,34 @@
             
             // Count direction
             let dir = 0;
-            if (board[INDEX+1] == 0) dir = 1;
-            else if (board[INDEX-1] == 0) dir = -1;
-            else if (board[INDEX+size] == 0) dir = size;
-            else if (board[INDEX-size] == 0) dir = -size;
+            if (board[INDEX+1] == 0)
+            {
+                if ((INDEX+1) % size == 0) return;
+                dir = 1;
+                board[INDEX].posX++;
+            }
+            else if (board[INDEX-1] == 0)
+            {
+                if (INDEX % size == 0) return;
+                dir = -1;
+                board[INDEX].posX--;
+            }
+            else if (board[INDEX+size] == 0)
+            {
+                dir = size;
+                board[INDEX].posY++;
+            }
+            else if (board[INDEX-size] == 0)
+            {
+                dir = -size;
+                board[INDEX].posY--;
+            }
             else return;
 
             // Make move
-            if (Math.abs(dir) == 1)
-            {
-                // Horisontal
-                if (dir > 0 && ((INDEX+dir) % size) == 0) dir = 0;
-                else if (dir < 0 && (INDEX % size) == 0) dir = 0;
-                if (board[INDEX+dir] == 0)
-                {
-                    board[INDEX].posX += dir;
-                    CELLS[TARGET].style.transform =  'translateX(' + board[INDEX].posX*100 + '%) translateY(' + board[INDEX].posY*100 + '%)';
-                    board[INDEX+dir] = board[INDEX];
-                    board[INDEX] = 0;
-                }
-            }
-            else if (Math.abs(dir) == size)
-            {
-                // Vertical
-                board[INDEX].posY += dir/size;
-                CELLS[TARGET].style.transform =  'translateX(' + board[INDEX].posX*100 + '%) translateY(' + board[INDEX].posY*100 + '%)';
-                board[INDEX+dir] = board[INDEX];
-                board[INDEX] = 0;
-            }
+            CELLS[TARGET].style.transform =  'translateX(' + board[INDEX].posX*100 + '%) translateY(' + board[INDEX].posY*100 + '%)';
+            board[INDEX+dir] = board[INDEX];
+            board[INDEX] = 0;
         }
 
         // Cell click events
@@ -126,10 +128,7 @@
         // Scarmble
         function Scramble()
         {
-            for (let i = 0; i < 900; i++)
-            {
-                MoveCell(Math.round(Math.random()*14));
-            }
+            for (let i = 0; i < 500; i++) MoveCell(Math.round(Math.random()*14));
         }
     </script>
 </body>

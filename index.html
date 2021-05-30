@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <head>
-    <title>Barley-break</title>
+    <title>15 Puzzle</title>
     <style>
         BODY {
             display: flex;
             flex-direction: column;
             align-items: center;
             touch-action: manipulation;
+            font: bold 30px Arial;
         }
         .board {
-            width: 400px; height: 400px; /* Define sizes of the board */
             position: relative;
             background: rgba(0, 0, 0, 0.2);
             box-shadow: 0px 0px 15px 5px rgba(0, 0, 0, 0.2) inset;
@@ -21,8 +21,7 @@
             cursor:pointer;
             user-select: none;
             
-            font: bold 40px Arial;
-            color: rgba(0, 0, 0, 0.7);
+            color: rgba(0, 0, 0, 0.75);
 
             display: flex;
             align-items: center;
@@ -30,67 +29,33 @@
 
             transition: .2s;
         }
-        .title {
-            font: bold 30px Arial;
-            color: rgba(0, 0, 0, 0.85);
-            margin: 30px;
-        }
-        .scramble {
-            height: 45px;
-            width: 135px;
-            margin: 30px;
-            background: rgba(0, 0, 0, 0.1);
-            border-radius: 15px;
-            
-            font: bold 20px Arial;
-            color: rgba(0, 0, 0, 0.75);
-            box-shadow: 0px 0px 10px 5px rgba(0, 0, 0, 0.2);
-            letter-spacing: 1px;
-
-            cursor: pointer;
-            user-select: none;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
+        
         /* Some adaptive for board */
         @media (orientation: landscape) {
             .board { width: 70vh; height: 70vh; }
-            .board_cell { font-size: 7vh; }
+            .button { margin: 30px; transform: scale(2); }
         }
 
         @media (orientation: portrait) {
             .board { width: 80vw; height: 80vw; }
-            .board_cell { font-size: 10vw; }
+            .button { margin: 60px; transform: scale(4); }
         }
     </style>
 </head>
 <body>
-    <div class="title">Barley-break</div>
+    <h1>15 Puzzle</h1>
     <div class="board"></div>
-    <div class="scramble" onclick="Scramble()">Scramble</div>
+    <button class="button" onclick="Scramble()">Scramble</button>
+    <div style="display: flex; align-items: center;">
+        <button class="button" onclick="ChangeSize(-1)">-</button>
+        <h2></h2>
+        <button class="button" onclick="ChangeSize(1)">+</button>
+    </div>
 
     <script>
         const BOARD = document.querySelector('.board');
-        const size = 4;
-        var board = [];
+        var CELLS, size, board;
 
-        // Create cells
-        for (let i = 0; i < size*size-1; i++)
-        {
-            let cell = {
-                posX: i - Math.floor(i/size)*size,
-                posY: Math.floor(i/size),
-                index: i
-            };
-            board.push(cell);
-            BOARD.innerHTML += '<div class="board_cell" style="height:' + (100/size) + '%; width:' + (100/size) + '%; transform: translateX(' + cell.posX*100 + '%) translateY(' + cell.posY*100 + '%); background: rgb(' + 0 + ',' + Math.round(i/size/size*240) + ', 255);">' + (i+1) +'</div>'
-        }
-        board[size*size-1] = 0;
-
-        // Move logic
         function MoveCell(TARGET)
         {
             // Find cell in array
@@ -131,16 +96,42 @@
             board[INDEX] = 0;
         }
 
-        // Cell click events
-        const CELLS = document.querySelectorAll('.board_cell');
-        for (let i = 0; i < CELLS.length; i++)
-            CELLS[i].addEventListener('click', () => MoveCell(i));
-
-        // Scarmble
         function Scramble()
         {
-            for (let i = 0; i < 500; i++) MoveCell(Math.round(Math.random()*14));
+            for (let i = 0; i < 500; i++) MoveCell(Math.round(Math.random()*(size*size-2)));
+        }
+
+        function CreateBoard(CreateSize)
+        {
+            size = CreateSize;
+            board = [];
+            BOARD.innerHTML = '';
+
+            for (let i = 0; i < size*size-1; i++)
+            {
+                let cell = {
+                    posX: i - Math.floor(i/size)*size,
+                    posY: Math.floor(i/size),
+                    index: i
+                };
+                board.push(cell);
+                BOARD.innerHTML += '<div class="board_cell" style="font-size:' + Math.round(BOARD.clientHeight/size*0.5) + 'px; height:' + (100/size) + '%; width:' + (100/size) + '%; transform: translateX(' + cell.posX*100 + '%) translateY(' + cell.posY*100 + '%); background: rgb(' + 0 + ',' + Math.round(i/size/size*240) + ', 255);">' + (i+1) +'</div>'
+            }
+            board[size*size-1] = 0;
+            CELLS = document.querySelectorAll('.board_cell');
+            for (let i = 0; i < CELLS.length; i++) CELLS[i].addEventListener('click', () => MoveCell(i));
+            document.querySelector('H2').innerText = 'size: ' + size;
+        }
+        
+        function ChangeSize(change)
+        {
+            if (size+change > 10 || size+change < 2) return;
+            else CreateBoard(size+change);
+        }
+
+        window.onload = function()
+        {
+            CreateBoard(4);
         }
     </script>
 </body>
-</html>

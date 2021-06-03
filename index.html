@@ -8,6 +8,7 @@
             align-items: center;
             touch-action: manipulation;
             font: bold 30px Arial;
+            user-select: none;
         }
         .board {
             position: relative;
@@ -17,16 +18,11 @@
         .board_cell {
             position: absolute;
             box-shadow: 0px 0px 15px 5px rgba(0, 0, 0, 0.1) inset;
-
             cursor:pointer;
-            user-select: none;
-            
             color: rgba(0, 0, 0, 0.75);
-
             display: flex;
             align-items: center;
             justify-content: center;
-
             transition: .2s;
         }
         
@@ -44,7 +40,9 @@
 </head>
 <body>
     <h1>15 Puzzle</h1>
+
     <div class="board"></div>
+    
     <button class="button" onclick="Scramble()">Scramble</button>
     <div style="display: flex; align-items: center;">
         <button class="button" onclick="ChangeSize(-1)">-</button>
@@ -103,10 +101,12 @@
 
         function CreateBoard(CreateSize)
         {
+            // clear data
             size = CreateSize;
             board = [];
             BOARD.innerHTML = '';
 
+            // generate cells
             for (let i = 0; i < size*size-1; i++)
             {
                 let cell = {
@@ -115,11 +115,12 @@
                     index: i
                 };
                 board.push(cell);
-                BOARD.innerHTML += '<div class="board_cell" style="font-size:' + Math.round(BOARD.clientHeight/size*0.5) + 'px; height:' + (100/size) + '%; width:' + (100/size) + '%; transform: translateX(' + cell.posX*100 + '%) translateY(' + cell.posY*100 + '%); background: rgb(' + 0 + ',' + Math.round(i/size/size*240) + ', 255);">' + (i+1) +'</div>'
+                BOARD.innerHTML += '<div class="board_cell" onclick="MoveCell(' + i + ')" style="font-size:' + Math.round(BOARD.clientHeight/size*0.5) + 'px; height:' + (100/size) + '%; width:' + (100/size) + '%; transform: translateX(' + cell.posX*100 + '%) translateY(' + cell.posY*100 + '%); background: rgb(' + 0 + ',' + Math.round(i/size/size*240) + ', 255);">' + (i+1) +'</div>'
             }
             board[size*size-1] = 0;
+
+            // update data
             CELLS = document.querySelectorAll('.board_cell');
-            for (let i = 0; i < CELLS.length; i++) CELLS[i].addEventListener('click', () => MoveCell(i));
             document.querySelector('H2').innerText = 'size: ' + size;
         }
         
